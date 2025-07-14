@@ -20,8 +20,16 @@ const AdminPage = () => {
   const fetchCourses = async () => {
     try {
       const response = await axios.get('http://localhost:3000/api/courses');
-      setCourses(response.data);
-      console.log(response.data);
+      // Handle the new serialized response structure
+      const coursesData = response.data.data || response.data;
+      const courses = Array.isArray(coursesData) 
+        ? coursesData.map(course => ({
+            _id: course.id,
+            ...course.attributes
+          }))
+        : coursesData.attributes ? [{ _id: coursesData.id, ...coursesData.attributes }] : [];
+      setCourses(courses);
+      console.log(courses);
     } catch (error) {
       console.error('Error fetching courses:', error);
     }
